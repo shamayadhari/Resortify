@@ -218,7 +218,7 @@ The frontend is under development, and backend integration is being worked on.
 
 ## 👩‍💻 Developer
 
-**Varsha Pal,Shamaya Dhariwal, Chavi jaiswal, Palak Singh**
+**Varsha Pal, Shamaya Dhariwal, Chavi Jaiswal, Palak Singh**
 
 GitHub: [@shamayadhari](https://github.com/shamayadhari)
 
