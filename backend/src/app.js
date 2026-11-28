@@ -7,7 +7,6 @@ import { UPLOAD_DIR } from "./config/paths.js";
 import { errorHandler, notFound } from "./middleware/errors.js";
 import routes from "./routes/index.js";
 
-/** Origins may contain a wildcard subdomain, e.g. https://*.lovable.app */
 function originMatcher(list) {
   const exact = new Set(list.filter((o) => !o.includes("*")));
   const patterns = list
