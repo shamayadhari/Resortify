@@ -1,0 +1,38 @@
+# Whole stack on one machine:  docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+# Copy .env.prod.example to .env.prod and fill it in first. Put a TLS-terminating proxy (Caddy, nginx, a cloud load balancer) in front.
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      mongo: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://mongo:27017/resortify
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env.prod}
+      CLIENT_URL: ${PUBLIC_WEB_URL:?set PUBLIC_WEB_URL in .env.prod}
+      CORS_ORIGINS: ${PUBLIC_WEB_URL}
+      TRUST_PROXY: "1"
+    volumes: [uploads:/data/uploads]
+    ports: ["127.0.0.1:5000:5000"]
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_API_BASE_URL: ${PUBLIC_API_URL:?set PUBLIC_API_URL in .env.prod}
+    restart: unless-stopped
+    depends_on: [api]
+    ports: ["127.0.0.1:3000:3000"]
+volumes:
+  mongo-data:
+  uploads:
